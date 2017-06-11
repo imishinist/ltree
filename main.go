@@ -11,7 +11,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	root, err := NewTree(dir)
+	root := &Tree{Name: "/", Children: []*Tree{}}
+	root.Merge(dir)
 	if err != nil {
 		log.Fatal(err)
 	}

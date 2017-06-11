@@ -39,6 +39,34 @@ func (n *Tree) IsLeaf() bool {
 	return len(n.Children) == 0
 }
 
+func (n *Tree) Merge(path string) error {
+	paths, err := splitPath(path)
+	if err != nil {
+		return err
+	}
+	now := n
+	for i, path := range paths {
+		index := -1
+		for j, child := range now.Children {
+			if child.Name == path {
+				index = j
+			}
+		}
+		if index == -1 {
+			tree, err := pathsToTree(paths[i:])
+			if err != nil {
+				return err
+			}
+			tree.Parent = now
+			now.Children = append(now.Children, tree)
+			break
+		} else {
+			now = now.Children[index]
+		}
+	}
+	return nil
+}
+
 // path array convert to Node tree
 func pathsToTree(paths []string) (*Tree, error) {
 	nodes := []*Tree{}

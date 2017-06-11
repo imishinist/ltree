@@ -47,6 +47,28 @@ func TestPathsToTree(t *testing.T) {
 	}
 }
 
+func TestMerge(t *testing.T) {
+	assert := assert.New(t)
+	in := &Tree{nil, []*Tree{}, "/"}
+	root := &Tree{nil, []*Tree{}, "/"}
+	usrTree := &Tree{root, []*Tree{}, "usr"}
+	root.Children = append(root.Children, usrTree)
+	binTree := &Tree{usrTree, []*Tree{}, "bin"}
+	usrTree.Children = append(usrTree.Children, binTree)
+
+	cases := []struct {
+		Input  string
+		Output *Tree
+	}{
+		{"/usr/bin", root},
+	}
+
+	for _, c := range cases {
+		in.Merge(c.Input)
+		assert.Equal(c.Output, in)
+	}
+}
+
 func TestIsRoot(t *testing.T) {
 	assert := assert.New(t)
 
