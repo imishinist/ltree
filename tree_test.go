@@ -6,6 +6,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func create(name string) *Tree {
+	return &Tree{nil, []*Tree{}, name}
+}
+
+func concat(t *Tree, children ...*Tree) *Tree {
+	// Copy
+	c := &Tree{
+		Parent:   t.Parent,
+		Children: t.Children,
+		Name:     t.Name,
+	}
+	for _, child := range children {
+		child.Parent = c
+		c.Children = append(c.Children, child)
+	}
+	return c
+}
+
 func TestSplitPath(t *testing.T) {
 	assert := assert.New(t)
 
@@ -31,15 +49,11 @@ func TestSplitPath(t *testing.T) {
 func TestPathsToTree(t *testing.T) {
 	assert := assert.New(t)
 
-	usrTree := &Tree{nil, []*Tree{}, "usr"}
-	binTree := &Tree{usrTree, []*Tree{}, "bin"}
-	usrTree.Children = append(usrTree.Children, binTree)
-
 	cases := []struct {
 		Input  []string
 		Output *Tree
 	}{
-		{[]string{"usr", "bin"}, usrTree},
+		{[]string{"usr", "bin"}, concat(create("usr"), create("bin"))},
 	}
 	for _, c := range cases {
 		output, _ := pathsToTree(c.Input)
@@ -49,18 +63,13 @@ func TestPathsToTree(t *testing.T) {
 
 func TestMerge(t *testing.T) {
 	assert := assert.New(t)
-	in := &Tree{nil, []*Tree{}, "/"}
-	root := &Tree{nil, []*Tree{}, "/"}
-	usrTree := &Tree{root, []*Tree{}, "usr"}
-	root.Children = append(root.Children, usrTree)
-	binTree := &Tree{usrTree, []*Tree{}, "bin"}
-	usrTree.Children = append(usrTree.Children, binTree)
+	in := create("/")
 
 	cases := []struct {
 		Input  string
 		Output *Tree
 	}{
-		{"/usr/bin", root},
+		{"/usr/bin", concat(create("/"), concat(create("usr"), create("bin")))},
 	}
 
 	for _, c := range cases {
@@ -72,16 +81,12 @@ func TestMerge(t *testing.T) {
 func TestIsRoot(t *testing.T) {
 	assert := assert.New(t)
 
-	usrTree := &Tree{nil, []*Tree{}, "usr"}
-	binTree := &Tree{usrTree, []*Tree{}, "bin"}
-	usrTree.Children = append(usrTree.Children, binTree)
-
 	cases := []struct {
 		Input  *Tree
 		Output bool
 	}{
-		{usrTree, true},
-		{binTree, false},
+		{create("usr"), true},
+		{concat(create("usr"), create("bin")).Children[0], false},
 	}
 
 	for _, c := range cases {
@@ -92,16 +97,13 @@ func TestIsRoot(t *testing.T) {
 func TestIsLeaf(t *testing.T) {
 	assert := assert.New(t)
 
-	usrTree := &Tree{nil, []*Tree{}, "usr"}
-	binTree := &Tree{usrTree, []*Tree{}, "bin"}
-	usrTree.Children = append(usrTree.Children, binTree)
-
 	cases := []struct {
 		Input  *Tree
 		Output bool
 	}{
-		{usrTree, false},
-		{binTree, true},
+		{create("usr"), true},
+		{concat(create("usr"), create("bin")), false},
+		{concat(create("usr"), create("bin")).Children[0], true},
 	}
 
 	for _, c := range cases {
