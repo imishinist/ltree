@@ -46,13 +46,7 @@ func (n *Tree) Merge(path string) error {
 	}
 	now := n
 	for i, path := range paths {
-		index := -1
-		for j, child := range now.Children {
-			if child.Name == path {
-				index = j
-			}
-		}
-		if index == -1 {
+		if child := now.Child(path); child == nil {
 			tree, err := pathsToTree(paths[i:])
 			if err != nil {
 				return err
@@ -61,7 +55,17 @@ func (n *Tree) Merge(path string) error {
 			now.Children = append(now.Children, tree)
 			break
 		} else {
-			now = now.Children[index]
+			now = child
+		}
+	}
+	return nil
+}
+
+// Child searches child from Children by name
+func (n *Tree) Child(name string) *Tree {
+	for _, child := range n.Children {
+		if child.Name == name {
+			return child
 		}
 	}
 	return nil
