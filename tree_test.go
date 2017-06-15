@@ -63,18 +63,23 @@ func TestPathsToTree(t *testing.T) {
 
 func TestMerge(t *testing.T) {
 	assert := assert.New(t)
-	in := create("/")
 
 	cases := []struct {
+		Object *Tree
 		Input  string
 		Output *Tree
+		Error  error
 	}{
-		{"/usr/bin", concat(create("/"), concat(create("usr"), create("bin")))},
+		{create("/"), "/usr/bin", concat(create("/"), concat(create("usr"), create("bin"))), nil},
+		{create("/"), "", create("/"), ErrInvalidPath},
+		{concat(create("/"), concat(create("usr"), create("bin"))), "/usr/lib", concat(create("/"), concat(create("usr"), create("bin"), create("lib"))), nil},
 	}
 
 	for _, c := range cases {
-		in.Merge(c.Input)
+		in := c.Object
+		err := in.Merge(c.Input)
 		assert.Equal(c.Output, in)
+		assert.Equal(c.Error, err)
 	}
 }
 
