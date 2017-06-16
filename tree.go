@@ -90,14 +90,21 @@ func pathsToTree(paths []string) (*Tree, error) {
 }
 
 // clean the invalid path, and split by separator
-// path is absolute path
 func splitPath(path string) ([]string, error) {
-	dir, file := filepath.Split(filepath.Clean(path))
-	if dir == "" {
+	if path == "" {
 		return nil, ErrInvalidPath
 	}
+	path = filepath.Clean(path)
+	dir, file := filepath.Split(path)
+
 	dirs := strings.Split(dir, string(filepath.Separator))
-	dirs = dirs[1 : len(dirs)-1]
+
+	if filepath.IsAbs(path) {
+		dirs = dirs[1 : len(dirs)-1]
+	} else {
+		dirs = dirs[:len(dirs)-1]
+	}
+
 	if file != "" {
 		dirs = append(dirs, file)
 	}

@@ -35,7 +35,8 @@ func TestSplitPath(t *testing.T) {
 		{"/usr/bin/cd", []string{"usr", "bin", "cd"}, nil},
 		{"/usr/bin/", []string{"usr", "bin"}, nil},
 		{"/usr/bin//tmp", []string{"usr", "bin", "tmp"}, nil},
-		{"/", []string{}, nil},
+		{"usr/bin", []string{"usr", "bin"}, nil},
+		{"usr/bin/", []string{"usr", "bin"}, nil},
 		{"", nil, ErrInvalidPath},
 	}
 

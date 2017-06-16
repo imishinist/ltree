@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 func main() {
@@ -17,13 +16,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	root := &Tree{Name: "/", Children: []*Tree{}}
+	root := &Tree{Name: ".", Children: []*Tree{}}
 	for _, file := range files {
-		path, err := filepath.Abs(file.Name())
-		if err != nil {
-			fmt.Println(err)
-		}
-		err = root.Merge(path)
+		err := root.Merge(file.Name())
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -32,23 +27,24 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	printTree(root, 0)
+	printTree(root, 0, true)
 }
 
-func printTree(root *Tree, depth int) {
+func printTree(root *Tree, depth int, last bool) {
 	indent := ""
 	for i := 0; i < depth; i++ {
 		if i == depth-1 {
-			indent += "└── "
-			//indent += "─── "
-			// indent += "└── "
-			//indent += "├── "
+			if last {
+				indent += "└── "
+			} else {
+				indent += "├── "
+			}
 		} else {
 			indent += "    "
 		}
 	}
 	fmt.Printf("%s%s\n", indent, root.Name)
-	for _, child := range root.Children {
-		printTree(child, depth+1)
+	for i, child := range root.Children {
+		printTree(child, depth+1, i == len(root.Children)-1)
 	}
 }
