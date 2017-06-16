@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func main() {
@@ -11,8 +13,22 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
 	root := &Tree{Name: "/", Children: []*Tree{}}
-	root.Merge(dir)
+	for _, file := range files {
+		path, err := filepath.Abs(file.Name())
+		if err != nil {
+			fmt.Println(err)
+		}
+		err = root.Merge(path)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
