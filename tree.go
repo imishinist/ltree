@@ -73,7 +73,7 @@ func (n *Tree) Child(name string) *Tree {
 
 // path array convert to Node tree
 func pathsToTree(paths []string) (*Tree, error) {
-	nodes := []*Tree{}
+	var nodes []*Tree
 	for _, path := range paths {
 		node := &Tree{
 			Parent:   nil,
