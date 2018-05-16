@@ -24,29 +24,6 @@ func concat(t *Tree, children ...*Tree) *Tree {
 	return c
 }
 
-func TestSplitPath(t *testing.T) {
-	assert := assert.New(t)
-
-	cases := []struct {
-		Input  string
-		Output []string
-		Error  error
-	}{
-		{"/usr/bin/cd", []string{"usr", "bin", "cd"}, nil},
-		{"/usr/bin/", []string{"usr", "bin"}, nil},
-		{"/usr/bin//tmp", []string{"usr", "bin", "tmp"}, nil},
-		{"usr/bin", []string{"usr", "bin"}, nil},
-		{"usr/bin/", []string{"usr", "bin"}, nil},
-		{"", nil, ErrInvalidPath},
-	}
-
-	for _, c := range cases {
-		output, err := splitPath(c.Input)
-		assert.Equal(c.Output, output)
-		assert.Equal(c.Error, err)
-	}
-}
-
 func TestPathsToTree(t *testing.T) {
 	assert := assert.New(t)
 
@@ -72,6 +49,7 @@ func TestMerge(t *testing.T) {
 		Error  error
 	}{
 		{create("/"), "/usr/bin", concat(create("/"), concat(create("usr"), create("bin"))), nil},
+		{create("."), "./usr/bin", concat(create("."), concat(create("usr"), create("bin"))), nil},
 		{create("/"), "", create("/"), ErrInvalidPath},
 		{concat(create("/"), concat(create("usr"), create("bin"))), "/usr/lib", concat(create("/"), concat(create("usr"), create("bin"), create("lib"))), nil},
 	}
