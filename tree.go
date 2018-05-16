@@ -1,14 +1,5 @@
 package main
 
-import (
-	"errors"
-	"path/filepath"
-	"strings"
-)
-
-// ErrInvalidPath is returned when path is invalid
-var ErrInvalidPath = errors.New("invalid path string")
-
 // Tree contains file or directory status
 type Tree struct {
 	Parent   *Tree
@@ -18,11 +9,7 @@ type Tree struct {
 
 // NewTree returns Node tree by path
 func NewTree(path string) (*Tree, error) {
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		return nil, err
-	}
-	paths, err := splitPath(absPath)
+	paths, err := splitPath(path)
 	if err != nil {
 		return nil, err
 	}
@@ -46,6 +33,9 @@ func (n *Tree) Merge(path string) error {
 	}
 	now := n
 	for i, path := range paths {
+		if now.Name == path {
+			continue
+		}
 		if child := now.Child(path); child == nil {
 			tree, err := pathsToTree(paths[i:])
 			if err != nil {
@@ -87,27 +77,4 @@ func pathsToTree(paths []string) (*Tree, error) {
 		nodes[i-1].Children = append(nodes[i-1].Children, nodes[i])
 	}
 	return nodes[0], nil
-}
-
-// clean the invalid path, and split by separator
-func splitPath(path string) ([]string, error) {
-	if path == "" {
-		return nil, ErrInvalidPath
-	}
-	path = filepath.Clean(path)
-	dir, file := filepath.Split(path)
-
-	dirs := strings.Split(dir, string(filepath.Separator))
-
-	if filepath.IsAbs(path) {
-		dirs = dirs[1 : len(dirs)-1]
-	} else {
-		dirs = dirs[:len(dirs)-1]
-	}
-
-	if file != "" {
-		dirs = append(dirs, file)
-	}
-
-	return dirs, nil
 }
