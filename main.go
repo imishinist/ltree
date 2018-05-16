@@ -30,7 +30,7 @@ func main() {
 
 func printTree(root *Tree) {
 	indents := []bool{false}
-	doTree(root, 0, indents, true)
+	doTree(root, -1, indents, true)
 }
 
 func doTree(root *Tree, depth int, indents []bool, last bool) {
@@ -42,10 +42,12 @@ func doTree(root *Tree, depth int, indents []bool, last bool) {
 			indent += "    "
 		}
 	}
-	if last {
-		indent += "└── "
-	} else {
-		indent += "├── "
+	if depth > -1 {
+		if last {
+			indent += "└── "
+		} else {
+			indent += "├── "
+		}
 	}
 	fmt.Printf("%s%s\n", indent, root.Name)
 	for i, child := range root.Children {
