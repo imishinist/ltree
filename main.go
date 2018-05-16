@@ -29,24 +29,25 @@ func main() {
 }
 
 func printTree(root *Tree) {
-	indents := []bool{false}
-	doTree(root, -1, indents, true)
+	indents := []bool{}
+	doTree(root, indents, true)
 }
 
-func doTree(root *Tree, depth int, indents []bool, last bool) {
+func doTree(root *Tree, indents []bool, last bool) {
 	indent := ""
-	for i := 0; i < depth; i++ {
-		if indents[i] {
-			indent += "│   "
+	for i := 0; i < len(indents); i++ {
+		if i == len(indents)-1 {
+			if last {
+				indent += "└── "
+			} else {
+				indent += "├── "
+			}
 		} else {
-			indent += "    "
-		}
-	}
-	if depth > -1 {
-		if last {
-			indent += "└── "
-		} else {
-			indent += "├── "
+			if indents[i] {
+				indent += "│   "
+			} else {
+				indent += "    "
+			}
 		}
 	}
 	fmt.Printf("%s%s\n", indent, root.Name)
@@ -58,6 +59,6 @@ func doTree(root *Tree, depth int, indents []bool, last bool) {
 		} else {
 			indentsTmp = append(indentsTmp, true)
 		}
-		doTree(child, depth+1, indentsTmp, i == len(root.Children)-1)
+		doTree(child, indentsTmp, i == len(root.Children)-1)
 	}
 }
