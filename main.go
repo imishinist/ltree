@@ -2,14 +2,29 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"strings"
 )
 
 func main() {
+	body, err := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	paths := strings.Split(string(body), "\n")
+
 	root, err := NewTree(".")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	for _, path := range paths {
+		root.Merge(path)
+	}
+
 	printTree(root)
 }
 

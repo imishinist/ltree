@@ -18,11 +18,7 @@ type Tree struct {
 
 // NewTree returns Node tree by path
 func NewTree(path string) (*Tree, error) {
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		return nil, err
-	}
-	paths, err := splitPath(absPath)
+	paths, err := splitPath(path)
 	if err != nil {
 		return nil, err
 	}
