@@ -6,25 +6,29 @@ import (
 	"strings"
 )
 
+type Splitter interface {
+	Split(string) ([]string, error)
+}
+
 var (
 	Separator string = string(filepath.Separator)
 
 	// ErrInvalidPath is returned when path is invalid
 	ErrInvalidPath error = errors.New("invalid path string")
 
-	DefaultSplitter *Splitter = &Splitter{
+	DefaultSplitter Splitter = &SingleSplitter{
 		Sep:   Separator,
 		Clean: false,
 	}
 )
 
-type Splitter struct {
+type SingleSplitter struct {
 	Sep   string
 	Clean bool
 }
 
 // clean the invalid path, and split by separator
-func (s *Splitter) Split(path string) ([]string, error) {
+func (s *SingleSplitter) Split(path string) ([]string, error) {
 	if path == "" {
 		return nil, ErrInvalidPath
 	}
