@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -8,7 +9,22 @@ import (
 	"strings"
 )
 
+func usage() {
+	fmt.Fprintf(os.Stderr, `Usage of %s:
+	%s [OPTIONS]
+
+Options:
+`, os.Args[0], os.Args[0])
+	flag.PrintDefaults()
+}
+
 func main() {
+	var (
+		delim = flag.String("d", "/", "delimiters")
+	)
+	flag.Usage = usage
+	flag.Parse()
+
 	body, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatal(err)
@@ -16,7 +32,7 @@ func main() {
 
 	paths := strings.Split(string(body), "\n")
 
-	delims := []string{".", "/", ":"}
+	delims := []string{*delim}
 	splitter := NewSplitter(delims)
 
 	root, err := NewSTree("<root>", splitter)
