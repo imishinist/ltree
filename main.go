@@ -21,6 +21,7 @@ Options:
 func main() {
 	var (
 		delim = flag.String("d", "/", "delimiters")
+		tac = flag.Bool("tac", false, "reverse option")
 	)
 	flag.Usage = usage
 	flag.Parse()
@@ -33,7 +34,12 @@ func main() {
 	paths := strings.Split(string(body), "\n")
 
 	delims := []string{*delim}
-	splitter := NewSplitter(delims)
+	var splitter Splitter
+	if *tac {
+		splitter = NewReverseSplitter(delims)
+	} else {
+		splitter = NewSplitter(delims)
+	}
 
 	root, err := NewSTree("<root>", splitter)
 	if err != nil {
