@@ -16,7 +16,10 @@ func main() {
 
 	paths := strings.Split(string(body), "\n")
 
-	root, err := NewTree(".")
+	delims := []string{".", "/", ":"}
+	splitter := NewSplitter(delims)
+
+	root, err := NewSTree("<root>", splitter)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -7,7 +7,8 @@ import (
 )
 
 func create(name string) *Tree {
-	return &Tree{nil, []*Tree{}, name}
+	var splitter Splitter = DefaultSplitter
+	return &Tree{nil, []*Tree{}, name, splitter}
 }
 
 func concat(t *Tree, children ...*Tree) *Tree {
@@ -16,6 +17,7 @@ func concat(t *Tree, children ...*Tree) *Tree {
 		Parent:   t.Parent,
 		Children: t.Children,
 		Name:     t.Name,
+		splitter: t.splitter,
 	}
 	for _, child := range children {
 		child.Parent = c
@@ -26,15 +28,17 @@ func concat(t *Tree, children ...*Tree) *Tree {
 
 func TestPathsToTree(t *testing.T) {
 	assert := assert.New(t)
+	var splitter Splitter = DefaultSplitter
 
 	cases := []struct {
 		Input  []string
+		Splitter Splitter
 		Output *Tree
 	}{
-		{[]string{"usr", "bin"}, concat(create("usr"), create("bin"))},
+		{[]string{"usr", "bin"}, splitter, concat(create("usr"), create("bin"))},
 	}
 	for _, c := range cases {
-		output, _ := pathsToTree(c.Input)
+		output, _ := pathsToTree(c.Input, c.Splitter)
 		assert.Equal(c.Output, output)
 	}
 }
