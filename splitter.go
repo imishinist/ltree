@@ -22,6 +22,33 @@ var (
 	}
 )
 
+func NewSplitter(seps []string) Splitter {
+	return &MultiSplitter{
+		Sep: seps,
+		Clean: false,
+	}
+}
+
+type MultiSplitter struct {
+	Sep []string
+	Clean bool
+}
+
+func (s *MultiSplitter) Split(path string) ([]string, error) {
+	replace_strings := make([]string, 0, 2 * len(s.Sep))
+	for _, s := range s.Sep {
+		replace_strings = append(replace_strings, s)
+		replace_strings = append(replace_strings, Separator)
+	}
+	r := strings.NewReplacer(replace_strings...)
+	path = r.Replace(path)
+	single_splitter := &SingleSplitter{
+		Sep: Separator,
+		Clean: s.Clean,
+	}
+	return single_splitter.Split(path)
+}
+
 type SingleSplitter struct {
 	Sep   string
 	Clean bool
