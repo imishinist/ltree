@@ -6,26 +6,56 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSplit(t *testing.T) {
+func TestSingleSplit(t *testing.T) {
 	assert := assert.New(t)
 
 	cases := []struct {
-		Object *Splitter
+		Object *SingleSplitter
 		Input  string
 		Output []string
 		Error  error
 	}{
-		{&Splitter{Separator, true}, "/usr/bin/cd", []string{"usr", "bin", "cd"}, nil},
-		{&Splitter{Separator, true}, "/usr/bin/", []string{"usr", "bin"}, nil},
-		{&Splitter{Separator, true}, "/usr/bin//tmp", []string{"usr", "bin", "tmp"}, nil},
-		{&Splitter{Separator, true}, "usr/bin", []string{"usr", "bin"}, nil},
-		{&Splitter{Separator, true}, "usr/bin/", []string{"usr", "bin"}, nil},
-		{&Splitter{Separator, true}, "./usr/bin", []string{"usr", "bin"}, nil},
-		{&Splitter{Separator, false}, "/usr/bin//tmp", []string{"usr", "bin", "", "tmp"}, nil},
-		{&Splitter{Separator, false}, "usr/bin", []string{"usr", "bin"}, nil},
-		{&Splitter{Separator, false}, "usr/bin/", []string{"usr", "bin"}, nil},
-		{&Splitter{Separator, false}, "./usr/bin", []string{".", "usr", "bin"}, nil},
-		{DefaultSplitter, "", nil, ErrInvalidPath},
+		{&SingleSplitter{Separator, true}, "/usr/bin/cd", []string{"usr", "bin", "cd"}, nil},
+		{&SingleSplitter{Separator, true}, "/usr/bin/", []string{"usr", "bin"}, nil},
+		{&SingleSplitter{Separator, true}, "/usr/bin//tmp", []string{"usr", "bin", "tmp"}, nil},
+		{&SingleSplitter{Separator, true}, "usr/bin", []string{"usr", "bin"}, nil},
+		{&SingleSplitter{Separator, true}, "usr/bin/", []string{"usr", "bin"}, nil},
+		{&SingleSplitter{Separator, true}, "./usr/bin", []string{"usr", "bin"}, nil},
+		{&SingleSplitter{Separator, false}, "/usr/bin//tmp", []string{"usr", "bin", "", "tmp"}, nil},
+		{&SingleSplitter{Separator, false}, "usr/bin", []string{"usr", "bin"}, nil},
+		{&SingleSplitter{Separator, false}, "usr/bin/", []string{"usr", "bin"}, nil},
+		{&SingleSplitter{Separator, false}, "./usr/bin", []string{".", "usr", "bin"}, nil},
+	}
+
+	for _, c := range cases {
+		output, err := c.Object.Split(c.Input)
+		assert.Equal(c.Output, output)
+		assert.Equal(c.Error, err)
+	}
+}
+
+func TestMultiSplit(t *testing.T) {
+	assert := assert.New(t)
+	seps := []string{Separator}
+
+	cases := []struct {
+		Object *MultiSplitter
+		Input  string
+		Output []string
+		Error  error
+	}{
+		{&MultiSplitter{seps, true}, "/usr/bin/cd", []string{"usr", "bin", "cd"}, nil},
+		{&MultiSplitter{seps, true}, "/usr/bin/", []string{"usr", "bin"}, nil},
+		{&MultiSplitter{seps, true}, "/usr/bin//tmp", []string{"usr", "bin", "tmp"}, nil},
+		{&MultiSplitter{seps, true}, "usr/bin", []string{"usr", "bin"}, nil},
+		{&MultiSplitter{seps, true}, "usr/bin/", []string{"usr", "bin"}, nil},
+		{&MultiSplitter{seps, true}, "./usr/bin", []string{"usr", "bin"}, nil},
+		{&MultiSplitter{[]string{"/", ","}, true}, "./usr,bin", []string{"usr", "bin"}, nil},
+		{&MultiSplitter{[]string{"/", ","}, true}, "./usr,,bin", []string{"usr", "bin"}, nil},
+		{&MultiSplitter{seps, false}, "/usr/bin//tmp", []string{"usr", "bin", "", "tmp"}, nil},
+		{&MultiSplitter{seps, false}, "usr/bin", []string{"usr", "bin"}, nil},
+		{&MultiSplitter{seps, false}, "usr/bin/", []string{"usr", "bin"}, nil},
+		{&MultiSplitter{seps, false}, "./usr/bin", []string{".", "usr", "bin"}, nil},
 	}
 
 	for _, c := range cases {

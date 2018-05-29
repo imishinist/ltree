@@ -5,15 +5,26 @@ type Tree struct {
 	Parent   *Tree
 	Children []*Tree
 	Name     string
+	splitter Splitter
 }
 
 // NewTree returns Node tree by path
 func NewTree(path string) (*Tree, error) {
-	paths, err := splitPath(path)
+	splitter := DefaultSplitter
+	return NewSTree(path, splitter)
+}
+
+func NewSTree(path string, splitter Splitter) (*Tree, error) {
+	paths, err := splitter.Split(path)
 	if err != nil {
 		return nil, err
 	}
-	return pathsToTree(paths)
+	tree, err := pathsToTree(paths, splitter)
+	if err != nil {
+		return nil, err
+	}
+	tree.splitter = splitter
+	return tree, nil
 }
 
 // IsRoot returns whether or not it's root
@@ -27,7 +38,7 @@ func (n *Tree) IsLeaf() bool {
 }
 
 func (n *Tree) Merge(path string) error {
-	paths, err := splitPath(path)
+	paths, err := n.splitter.Split(path)
 	if err != nil {
 		return err
 	}
@@ -37,7 +48,7 @@ func (n *Tree) Merge(path string) error {
 			continue
 		}
 		if child := now.Child(path); child == nil {
-			tree, err := pathsToTree(paths[i:])
+			tree, err := pathsToTree(paths[i:], n.splitter)
 			if err != nil {
 				return err
 			}
@@ -62,13 +73,14 @@ func (n *Tree) Child(name string) *Tree {
 }
 
 // path array convert to Node tree
-func pathsToTree(paths []string) (*Tree, error) {
+func pathsToTree(paths []string, splitter Splitter) (*Tree, error) {
 	var nodes []*Tree
 	for _, path := range paths {
 		node := &Tree{
 			Parent:   nil,
 			Children: []*Tree{},
 			Name:     path,
+			splitter: splitter,
 		}
 		nodes = append(nodes, node)
 	}
