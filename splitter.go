@@ -22,6 +22,29 @@ var (
 	}
 )
 
+func NewReverseSplitter(seps []string) Splitter {
+	splitter := NewSplitter(seps)
+	return &ReverseSplitter{
+		splitter,
+	}
+}
+
+type ReverseSplitter struct {
+	splitter Splitter
+}
+
+func (s *ReverseSplitter) Split(path string) ([]string, error) {
+	paths, err := s.splitter.Split(path)
+	if err != nil {
+		return nil, err
+	}
+	for i := 0; i < len(paths) / 2; i++ {
+		index := len(paths) - 1 - i
+		paths[i], paths[index] = paths[index], paths[i]
+	}
+	return paths, nil
+}
+
 func NewSplitter(seps []string) Splitter {
 	return &MultiSplitter{
 		Sep: seps,
