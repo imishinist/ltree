@@ -38,7 +38,7 @@ func (s *ReverseSplitter) Split(path string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i := 0; i < len(paths) / 2; i++ {
+	for i := 0; i < len(paths)/2; i++ {
 		index := len(paths) - 1 - i
 		paths[i], paths[index] = paths[index], paths[i]
 	}
@@ -47,18 +47,18 @@ func (s *ReverseSplitter) Split(path string) ([]string, error) {
 
 func NewSplitter(seps []string) Splitter {
 	return &MultiSplitter{
-		Sep: seps,
+		Sep:   seps,
 		Clean: false,
 	}
 }
 
 type MultiSplitter struct {
-	Sep []string
+	Sep   []string
 	Clean bool
 }
 
 func (s *MultiSplitter) Split(path string) ([]string, error) {
-	replace_strings := make([]string, 0, 2 * len(s.Sep))
+	replace_strings := make([]string, 0, 2*len(s.Sep))
 	for _, s := range s.Sep {
 		replace_strings = append(replace_strings, s)
 		replace_strings = append(replace_strings, Separator)
@@ -66,7 +66,7 @@ func (s *MultiSplitter) Split(path string) ([]string, error) {
 	r := strings.NewReplacer(replace_strings...)
 	path = r.Replace(path)
 	single_splitter := &SingleSplitter{
-		Sep: Separator,
+		Sep:   Separator,
 		Clean: s.Clean,
 	}
 	return single_splitter.Split(path)

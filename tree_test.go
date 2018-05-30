@@ -31,9 +31,9 @@ func TestPathsToTree(t *testing.T) {
 	var splitter Splitter = DefaultSplitter
 
 	cases := []struct {
-		Input  []string
+		Input    []string
 		Splitter Splitter
-		Output *Tree
+		Output   *Tree
 	}{
 		{[]string{"usr", "bin"}, splitter, concat(create("usr"), create("bin"))},
 	}

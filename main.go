@@ -21,7 +21,7 @@ Options:
 func main() {
 	var (
 		delim = flag.String("d", "/", "delimiters")
-		tac = flag.Bool("tac", false, "reverse option")
+		tac   = flag.Bool("tac", false, "reverse option")
 	)
 	flag.Usage = usage
 	flag.Parse()
