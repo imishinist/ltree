@@ -64,3 +64,31 @@ func TestMultiSplit(t *testing.T) {
 		assert.Equal(c.Error, err)
 	}
 }
+
+func TestReverseSplit(t *testing.T) {
+	assert := assert.New(t)
+	seps := []string{Separator}
+
+	cases := []struct {
+		Object Splitter
+		Input  string
+		Output []string
+		Error  error
+	}{
+		{NewReverseSplitter(seps), "/usr/bin/cd", []string{"cd", "bin", "usr"}, nil},
+		{NewReverseSplitter(seps), "/usr/bin/", []string{"bin", "usr"}, nil},
+		{NewReverseSplitter(seps), "/usr/bin//tmp", []string{"tmp", "", "bin", "usr"}, nil},
+		{NewReverseSplitter(seps), "usr/bin", []string{"bin", "usr"}, nil},
+		{NewReverseSplitter(seps), "usr/bin/", []string{"bin", "usr"}, nil},
+		{NewReverseSplitter(seps), "./usr/bin", []string{"bin", "usr", "."}, nil},
+		{NewReverseSplitter([]string{"/", ","}), "./usr,bin", []string{"bin", "usr", "."}, nil},
+		{NewReverseSplitter([]string{"/", ","}), "./usr,,bin", []string{"bin", "", "usr", "."}, nil},
+		{NewReverseSplitter(seps), "/usr/bin//tmp", []string{"tmp", "", "bin", "usr"}, nil},
+	}
+
+	for _, c := range cases {
+		output, err := c.Object.Split(c.Input)
+		assert.Equal(c.Output, output)
+		assert.Equal(c.Error, err)
+	}
+}
