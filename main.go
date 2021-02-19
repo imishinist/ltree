@@ -1,4 +1,4 @@
-package main // import "github.com/imishinist/ltree"
+package main
 
 import (
 	"flag"
